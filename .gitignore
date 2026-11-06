@@ -12,3 +12,4 @@
 *.keystore
 *.jks
 /design
+/docs/raw

@@ -6,13 +6,16 @@ line "<!-- tg", then 2-4 short lines in Russian for users (what is new, what is 
 then close it like any HTML comment. The release notes carry it, and the chat bot posts those lines.
 -->
 
-## [Unreleased]
+## [1.0.1]
 
 - Rooms can be put in your own order: hold a room on the home screen and drag it to its new place (#1).
+- Places can be renamed and deleted: tap the chosen place again, or hold any place. A place goes only when its rooms hold no things.
 - Settings → StillCraft has a line to support Hob.
+- Fixed: sheets opened from the home and hob screens (another place, selling) no longer hide their buttons under the tab bar.
 
 <!-- tg
 Комнаты теперь можно расставить по-своему: зажмите комнату на главном экране и перетащите её.
+Адреса можно переименовать и удалить: нажмите на выбранный адрес ещё раз или зажмите любой.
 В настройках появилась строка «Поддержать Домового».
 -->
 

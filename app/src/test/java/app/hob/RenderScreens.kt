@@ -85,7 +85,8 @@ abstract class ScreensBase {
         rule.setContent { HobTheme(theme) { key(which.first) { HobRoot(st.copy(theme = theme), which.second, which.third) } } }
         for (sc in list) {
             rule.runOnUiThread { which = sc }
-            settle(app.getString(R.string.tab_people))
+            // Screens laid over the tabs have no tab bar to wait for.
+            settle(if (sc.third == null) app.getString(R.string.tab_people) else null)
             save(sc.first)
         }
     }

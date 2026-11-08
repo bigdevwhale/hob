@@ -13,3 +13,4 @@
 *.jks
 /design
 /docs/raw
+__pycache__/

@@ -1,0 +1,1 @@
+First release on Google Play. New: rooms can be put in your own order (hold a room and drag it), and places can be renamed and deleted (hold a place).

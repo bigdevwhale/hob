@@ -29,6 +29,8 @@ import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import app.hob.ui.components.LocalAbove
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -119,14 +121,18 @@ fun HobRoot(s: Settings, tab: Tab = Tab.HOME, overlay: Overlay? = null) {
     Box(Modifier.fillMaxSize().room()) {
         // Only the top layer is heard by screen readers; the ones under it are still kept, so going back keeps their state.
         Box(Modifier.fillMaxSize().then(if (nav.stack.isNotEmpty()) Modifier.clearAndSetSemantics {} else Modifier)) {
-            when (nav.tab) {
-                Tab.HOME -> HomeScreen(h, nav)
-                Tab.FIND -> FindScreen(h, nav)
-                Tab.PEOPLE -> PeopleScreen(h, nav)
-                Tab.HOB -> HobScreen(h, nav)
+            val above = remember { mutableStateListOf<@Composable () -> Unit>() }
+            CompositionLocalProvider(LocalAbove provides above) {
+                when (nav.tab) {
+                    Tab.HOME -> HomeScreen(h, nav)
+                    Tab.FIND -> FindScreen(h, nav)
+                    Tab.PEOPLE -> PeopleScreen(h, nav)
+                    Tab.HOB -> HobScreen(h, nav)
+                }
             }
             StatusScrim()
             TabBar(nav, Modifier.align(Alignment.BottomCenter))
+            above.forEach { it() }
         }
         if (nav.stack.isNotEmpty()) BackHandler { nav.close() }
         nav.stack.forEachIndexed { i, o -> Box(Modifier.fillMaxSize().room()

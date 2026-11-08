@@ -36,6 +36,10 @@ import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -241,6 +245,22 @@ fun Scrim(onDismiss: (() -> Unit)?, bottom: Boolean = true, content: @Composable
 /** A bottom sheet with a title. */
 @Composable
 fun Sheet(title: String?, onDismiss: () -> Unit, content: @Composable ColumnScope.() -> Unit) {
+    // A sheet opened from a tab is drawn by the tabs' host, above the tab bar.
+    val above = LocalAbove.current
+    if (above != null) {
+        val latest by rememberUpdatedState<@Composable () -> Unit> { SheetBody(title, onDismiss, content) }
+        val entry = remember { @Composable { latest() } }
+        DisposableEffect(above) { above.add(entry); onDispose { above.remove(entry) } }
+        return
+    }
+    SheetBody(title, onDismiss, content)
+}
+
+/** Where the tab screens' sheets go to be drawn over the tab bar; null on pages, which already cover it. */
+val LocalAbove = staticCompositionLocalOf<MutableList<@Composable () -> Unit>?> { null }
+
+@Composable
+private fun SheetBody(title: String?, onDismiss: () -> Unit, content: @Composable ColumnScope.() -> Unit) {
     Scrim(onDismiss) {
         Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(topStart = 26.dp, topEnd = 26.dp)).background(if (C.dark) Color(0xFF26352F) else C.bg)
             .verticalScroll(rememberScrollState()).navigationBarsPadding().padding(start = 18.dp, end = 18.dp, top = 10.dp, bottom = 18.dp)) {

@@ -68,6 +68,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.hob.R
 import app.hob.container
+import app.hob.data.Place
 import app.hob.data.Room
 import app.hob.domain.Hint
 import app.hob.domain.House
@@ -84,6 +85,7 @@ import app.hob.ui.components.Field
 import app.hob.ui.components.HobFigure
 import app.hob.ui.components.HobMood
 import app.hob.ui.components.IconBtn
+import app.hob.ui.components.Kind
 import app.hob.ui.components.R18
 import app.hob.ui.components.SectionTitle
 import app.hob.ui.components.Sheet
@@ -118,6 +120,7 @@ fun HomeScreen(h: House, nav: Nav) {
     var place by rememberSaveable { mutableLongStateOf(h.places.firstOrNull()?.id ?: 0L) }
     if (h.places.none { it.id == place }) place = h.places.firstOrNull()?.id ?: 0L
     var newPlace by remember { mutableStateOf(false) }
+    var editPlace by remember { mutableStateOf<Place?>(null) }
     val dusty = h.dusty()
     val hour = LocalTime.now().hour
     val hello = stringResource(when (hour) { in 5..11 -> R.string.hello_morning; in 12..17 -> R.string.hello_day; in 18..22 -> R.string.hello_evening; else -> R.string.hello_night })
@@ -145,7 +148,7 @@ fun HomeScreen(h: House, nav: Nav) {
 
         SectionTitle(stringResource(R.string.rooms), action = stringResource(R.string.add_room)) { nav.open(Overlay.RoomEdit(place = place)) }
         Row(Modifier.padding(horizontal = 18.dp).padding(bottom = 10.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            for (p in h.places) Chip(p.name, p.id == place) { place = p.id }
+            for (p in h.places) Chip(p.name, p.id == place, onLongClick = { editPlace = p }) { if (p.id == place) editPlace = p else place = p.id }
             Chip("+", false) { newPlace = true }
         }
         RoomGrid(h, place, nav)
@@ -170,9 +173,30 @@ fun HomeScreen(h: House, nav: Nav) {
         Sheet(stringResource(R.string.new_place), { newPlace = false }) {
             Field(name, { name = it }, null, hint = stringResource(R.string.new_place_hint))
             Text(stringResource(R.string.new_place_b), style = T.Small, modifier = Modifier.padding(top = 10.dp))
+            Text(stringResource(R.string.edit_place_b), style = T.Small, modifier = Modifier.padding(top = 6.dp))
             Btn(stringResource(R.string.add_btn), {
                 if (name.isNotBlank()) c.write { place = addPlace(name); newPlace = false }
             }, Modifier.fillMaxWidth().padding(top = 16.dp), enabled = name.isNotBlank())
+        }
+    }
+
+    editPlace?.let { p ->
+        var name by remember(p.id) { mutableStateOf(p.name) }
+        val empty = h.roomsIn(p.id).all { h.thingsIn(it.id).isEmpty() }
+        Sheet(stringResource(R.string.edit_place), { editPlace = null }) {
+            Field(name, { name = it }, null, hint = stringResource(R.string.new_place_hint))
+            Btn(stringResource(R.string.save), {
+                if (name.isNotBlank()) c.write { renamePlace(p, name); editPlace = null }
+            }, Modifier.fillMaxWidth().padding(top = 16.dp), enabled = name.isNotBlank() && name.trim() != p.name)
+            // The last place stays: the house needs somewhere to be.
+            if (h.places.size > 1) {
+                if (empty) {
+                    Btn(stringResource(R.string.delete_place), {
+                        c.write { dropPlace(p); editPlace = null }
+                    }, Modifier.padding(top = 10.dp).fillMaxWidth(), Kind.GHOST, small = true)
+                    if (h.roomsIn(p.id).isNotEmpty()) Text(stringResource(R.string.delete_place_b), style = T.Small, modifier = Modifier.padding(top = 8.dp))
+                } else Text(stringResource(R.string.place_has_things), style = T.Small, modifier = Modifier.padding(top = 12.dp))
+            }
         }
     }
 }

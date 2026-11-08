@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -136,10 +137,10 @@ fun SectionTitle(text: String, modifier: Modifier = Modifier, note: String? = nu
 
 /** A selectable pill. */
 @Composable
-fun Chip(text: String, on: Boolean, onClick: () -> Unit) {
+fun Chip(text: String, on: Boolean, onLongClick: (() -> Unit)? = null, onClick: () -> Unit) {
     Text(text, style = T.Small.copy(color = if (on) C.onAmber else C.ink, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold, fontSize = 13.sp),
         modifier = Modifier.clip(PILL).background(if (on) C.amber else C.card).border(1.dp, if (on) C.amber else C.line, PILL)
-            .clickable(onClick = onClick).padding(horizontal = 13.dp, vertical = 7.dp))
+            .combinedClickable(onLongClick = onLongClick, onClick = onClick).padding(horizontal = 13.dp, vertical = 7.dp))
 }
 
 @OptIn(ExperimentalLayoutApi::class)

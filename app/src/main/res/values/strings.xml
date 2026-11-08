@@ -38,6 +38,11 @@
     <string name="new_place">Another place</string>
     <string name="new_place_hint">Garage, gran’s, the office</string>
     <string name="new_place_b">A place has its own rooms. Things there are found the same way.</string>
+    <string name="edit_place">The place</string>
+    <string name="edit_place_b">Tap the chosen place again, or hold any place, to rename it.</string>
+    <string name="delete_place">Delete the place</string>
+    <string name="delete_place_b">Its empty rooms go with it.</string>
+    <string name="place_has_things">A place can be deleted once its rooms hold no things.</string>
     <string name="hint_season">Soon needed: %1$s</string>
     <string name="hint_season_many">Soon needed: %1$s and %2$d more</string>
     <string name="hint_season_when">season: %1$s</string>

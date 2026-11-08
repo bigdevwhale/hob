@@ -47,6 +47,11 @@ S = [
     ("new_place", "Another place", "Ещё адрес"),
     ("new_place_hint", "Garage, gran’s, the office", "Гараж, у бабушки, офис"),
     ("new_place_b", "A place has its own rooms. Things there are found the same way.", "У адреса свои комнаты. Вещи там ищутся так же, как дома."),
+    ("edit_place", "The place", "Адрес"),
+    ("edit_place_b", "Tap the chosen place again, or hold any place, to rename it.", "Нажмите на выбранный адрес ещё раз или зажмите любой, чтобы переименовать."),
+    ("delete_place", "Delete the place", "Удалить адрес"),
+    ("delete_place_b", "Its empty rooms go with it.", "Пустые комнаты удалятся вместе с ним."),
+    ("place_has_things", "A place can be deleted once its rooms hold no things.", "Удалить адрес можно, когда в его комнатах не останется вещей."),
 
     # hints
     ("hint_season", "Soon needed: %1$s", "Скоро пригодится: %1$s"),
@@ -385,6 +390,8 @@ S = [
     ("community_follow_sub", "the bot writes when a new version is out", "бот напишет, когда выйдет новая версия"),
     ("community_chat", "StillCraft chat", "Чат StillCraft"),
     ("community_chat_sub", "all the apps and the people who use them", "все приложения и те, кто ими пользуется"),
+    ("community_support", "Support Hob", "Поддержать Домового"),
+    ("community_support_sub", "for new corners and a warm stove", "на новые уголки и тёплую печку"),
     ("about", "About", "О приложении"),
     ("about_text", "Hob %1$s. Free, no ads, no accounts.", "Домовой %1$s. Бесплатно, без рекламы и регистрации."),
     ("font_credits", "Fonts: Lora (Cyreal), Nunito (Vernon Adams), SIL Open Font License.", "Шрифты: Lora (Cyreal), Nunito (Vernon Adams), SIL Open Font License."),

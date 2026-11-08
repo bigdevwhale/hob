@@ -38,6 +38,11 @@
     <string name="new_place">Ещё адрес</string>
     <string name="new_place_hint">Гараж, у бабушки, офис</string>
     <string name="new_place_b">У адреса свои комнаты. Вещи там ищутся так же, как дома.</string>
+    <string name="edit_place">Адрес</string>
+    <string name="edit_place_b">Нажмите на выбранный адрес ещё раз или зажмите любой, чтобы переименовать.</string>
+    <string name="delete_place">Удалить адрес</string>
+    <string name="delete_place_b">Пустые комнаты удалятся вместе с ним.</string>
+    <string name="place_has_things">Удалить адрес можно, когда в его комнатах не останется вещей.</string>
     <string name="hint_season">Скоро пригодится: %1$s</string>
     <string name="hint_season_many">Скоро пригодится: %1$s и ещё %2$d</string>
     <string name="hint_season_when">сезон: %1$s</string>

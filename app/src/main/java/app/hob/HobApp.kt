@@ -51,6 +51,14 @@ class AppContainer(context: Context) {
 
     suspend fun addPlace(name: String): Long = dao.add(Place(name = name.trim(), sort = dao.placesNow().size))
 
+    suspend fun renamePlace(p: Place, name: String) = dao.save(p.copy(name = name.trim(), updated = now()))
+
+    /** Removes a place with its rooms; only offered when no thing lives in them. */
+    suspend fun dropPlace(p: Place) {
+        dao.roomsNow().filter { it.place == p.id }.forEach { dropRoom(it) }
+        dao.drop(p)
+    }
+
     suspend fun addRoom(place: Long, name: String, emoji: String, spots: List<String>): Long {
         val id = dao.add(Room(place = place, name = name.trim(), emoji = emoji, sort = dao.roomsNow().count { it.place == place }))
         spots.forEachIndexed { i, s -> dao.add(Spot(room = id, name = s.trim(), sort = i)) }

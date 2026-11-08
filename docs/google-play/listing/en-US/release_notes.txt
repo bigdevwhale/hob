@@ -1,1 +1,2 @@
-First release on Google Play. New: rooms can be put in your own order (hold a room and drag it), and places can be renamed and deleted (hold a place).
+New in 1.0.2:
+• Many more signs for things and rooms, in groups, and any emoji as a sign of your own.

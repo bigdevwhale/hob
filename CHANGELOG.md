@@ -6,6 +6,14 @@ line "<!-- tg", then 2-4 short lines in Russian for users (what is new, what is 
 then close it like any HTML comment. The release notes carry it, and the chat bot posts those lines.
 -->
 
+## [1.0.2] - 2026-11-08
+
+- Many more signs: about 240 for things, in groups (clothes, sport, gadgets, tools, kitchen, papers, children, holidays, home and garden, health and hobbies), and 40 for rooms. Any emoji can be typed in as a sign of your own (#3).
+
+<!-- tg
+Значков стало гораздо больше: около 240 для вещей, по группам, и 40 для комнат. А ещё можно поставить свой – любой эмодзи с клавиатуры.
+-->
+
 ## [1.0.1]
 
 - Rooms can be put in your own order: hold a room on the home screen and drag it to its new place (#1).

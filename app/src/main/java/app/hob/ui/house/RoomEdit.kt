@@ -45,7 +45,6 @@ import app.hob.ui.components.TopBar
 import app.hob.ui.theme.C
 import app.hob.ui.theme.T
 
-val ROOM_EMOJI = listOf("🚪", "🍳", "🧺", "🛏️", "🛋️", "🛁", "🪴", "🧸", "📦", "🪵", "🚗", "🕯️", "🧳", "🧰", "📚", "🎒", "🏚️", "🧹", "🪜", "🌿")
 
 /** A new room with its spots, or an existing one's name, sign and place. */
 @Composable
@@ -72,14 +71,8 @@ fun RoomEdit(o: Overlay.RoomEdit, h: House, nav: Nav) {
                 Chips { for (p in h.places) Chip(p.name, place == p.id) { place = p.id } }
             }
             Label(stringResource(R.string.room_sign))
-            ROOM_EMOJI.chunked(10).forEach { row ->
-                Row(Modifier.padding(bottom = 6.dp), horizontalArrangement = Arrangement.spacedBy(5.dp)) {
-                    for (e in row) Box(Modifier.weight(1f).aspectRatio(1f).clip(R14).background(if (emoji == e) C.amber.copy(alpha = .3f) else C.card)
-                        .border(1.dp, if (emoji == e) C.amber else C.line, R14).clickable { emoji = e }, contentAlignment = Alignment.Center) {
-                        Text(e, fontSize = 18.sp)
-                    }
-                }
-            }
+            app.hob.ui.add.SignGrid(app.hob.ui.add.ROOM_SIGNS, emoji, 10) { emoji = it }
+            app.hob.ui.add.OwnSign { emoji = it }
             if (old == null) {
                 Label(stringResource(R.string.room_spots))
                 Chips {

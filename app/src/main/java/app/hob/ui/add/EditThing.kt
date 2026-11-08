@@ -77,12 +77,6 @@ import app.hob.ui.theme.T
 import kotlinx.coroutines.launch
 import java.io.File
 
-val THING_EMOJI = listOf(
-    "📦", "🧥", "👖", "👗", "👕", "🧶", "🧢", "🧤", "🧣", "👟", "🥾", "⛸️", "🎿", "🚲", "🛴", "🛷", "⚽", "⛺",
-    "🔌", "🔋", "💻", "📱", "🎧", "📷", "💡", "🔦", "🧹", "🪛", "🔨", "🔧", "🪚", "🪜", "🧰", "🖌️",
-    "🎄", "🎁", "🎈", "📄", "🧾", "📚", "💿", "🧸", "🧱", "🧩", "🎲", "🪆", "🍳", "🍲", "🍽️", "🫙",
-    "🌱", "🪴", "🔥", "🧳", "🎒", "☂️", "💊", "🛏️", "🗝️", "🧵", "👶", "🖼️",
-)
 
 /** A new thing, or editing one: photo, name (the sign and kind guessed from it), where it lies, size for children, season. */
 @Composable
@@ -238,14 +232,6 @@ fun EditThing(o: Overlay.Edit, h: House, nav: Nav) {
     }
 
     if (picking) Sheet(stringResource(R.string.pick_sign), { picking = false }) {
-        THING_EMOJI.chunked(8).forEach { row ->
-            Row(Modifier.padding(bottom = 6.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                for (e in row) Box(Modifier.weight(1f).aspectRatio(1f).clip(R14).background(if (emoji == e) C.amber.copy(alpha = .3f) else C.card)
-                    .border(1.dp, if (emoji == e) C.amber else C.line, R14).clickable { emoji = e; manual = true; picking = false }, contentAlignment = Alignment.Center) {
-                    Text(e, fontSize = 20.sp)
-                }
-                repeat(8 - row.size) { Box(Modifier.weight(1f)) }
-            }
-        }
+        ThingSigns(emoji) { e -> emoji = e; manual = true; picking = false }
     }
 }

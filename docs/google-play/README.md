@@ -72,15 +72,18 @@ python tools/play.py   # home, find, room, thing, kid, people, clear-out, hob
 | Поле | Значение |
 |---|---|
 | App category | Application → **House & Home** |
-| Tags (до 5) | Home organization, Productivity, Lifestyle, Parenting, To-do list |
+| Tags (до 5) | House & home, Productivity, Notebook, Parenting, Lifestyle |
 | Email address | *ваш публичный email* — обязательно, его увидят все |
 | Website | `https://bigdevwhale.github.io/stillcraft/` |
 | Phone | пусто |
 | External marketing | можно оставить включённым |
 
 **Категория.** В House & Home ищут «домашняя опись», «где лежит», «home inventory». Альтернатива —
-**Productivity**. Категорию можно сменить позже в Store settings. Теги выбираются из списка Play;
-если какого-то из перечисленных там нет, возьмите ближайший.
+**Productivity**. Категорию можно сменить позже в Store settings.
+
+**Теги** — из списка Play. House & home — главный: опись дома. Productivity и Notebook — записать
+вещь и найти её. Parenting — вещи на вырост, рост и размеры детей. Lifestyle — разбор и уют.
+Interior design и Home automation не подходят: про ремонт и умный дом приложение не говорит.
 
 **Имя разработчика** (Settings → Developer account) — **Stillcraft**, как у Липовки: тогда Play сам покажет
 под карточкой «Другие приложения этого разработчика».

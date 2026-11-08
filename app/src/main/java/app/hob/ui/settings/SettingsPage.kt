@@ -59,6 +59,7 @@ object Community {
     const val IDEA = "${BOT}wish_$SLUG"
     const val FOLLOW = "${BOT}f_$SLUG"
     const val CHAT = "https://t.me/+Q4gFEDk8O842OGVi"
+    const val SUPPORT = "https://bigdevwhale.github.io/stillcraft/support/"
 }
 
 @Composable
@@ -142,6 +143,7 @@ fun SettingsPage(h: House, nav: Nav) {
                 Link(R.string.community_idea, R.string.community_idea_sub) { openUrl(ctx, Community.IDEA) }
                 Link(R.string.community_follow, R.string.community_follow_sub) { openUrl(ctx, Community.FOLLOW) }
                 Link(R.string.community_chat, R.string.community_chat_sub) { openUrl(ctx, Community.CHAT) }
+                Link(R.string.community_support, R.string.community_support_sub) { openUrl(ctx, Community.SUPPORT) }
                 Section(stringResource(R.string.about))
                 Text(stringResource(R.string.about_text, BuildConfig.VERSION_NAME), style = T.Small)
                 Text(stringResource(R.string.font_credits), style = T.Small, modifier = Modifier.padding(top = 6.dp))

@@ -328,6 +328,8 @@
     <string name="community_follow_sub">бот напишет, когда выйдет новая версия</string>
     <string name="community_chat">Чат StillCraft</string>
     <string name="community_chat_sub">все приложения и те, кто ими пользуется</string>
+    <string name="community_support">Поддержать Домового</string>
+    <string name="community_support_sub">на новые уголки и тёплую печку</string>
     <string name="about">О приложении</string>
     <string name="about_text">Домовой %1$s. Бесплатно, без рекламы и регистрации.</string>
     <string name="font_credits">Шрифты: Lora (Cyreal), Nunito (Vernon Adams), SIL Open Font License.</string>

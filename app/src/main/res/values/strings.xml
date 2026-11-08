@@ -331,6 +331,8 @@
     <string name="community_follow_sub">the bot writes when a new version is out</string>
     <string name="community_chat">StillCraft chat</string>
     <string name="community_chat_sub">all the apps and the people who use them</string>
+    <string name="community_support">Support Hob</string>
+    <string name="community_support_sub">for new corners and a warm stove</string>
     <string name="about">About</string>
     <string name="about_text">Hob %1$s. Free, no ads, no accounts.</string>
     <string name="font_credits">Fonts: Lora (Cyreal), Nunito (Vernon Adams), SIL Open Font License.</string>

@@ -6,6 +6,16 @@ line "<!-- tg", then 2-4 short lines in Russian for users (what is new, what is 
 then close it like any HTML comment. The release notes carry it, and the chat bot posts those lines.
 -->
 
+## [Unreleased]
+
+- Rooms can be put in your own order: hold a room on the home screen and drag it to its new place (#1).
+- Settings → StillCraft has a line to support Hob.
+
+<!-- tg
+Комнаты теперь можно расставить по-своему: зажмите комнату на главном экране и перетащите её.
+В настройках появилась строка «Поддержать Домового».
+-->
+
 ## [1.0.0]
 
 The first version.

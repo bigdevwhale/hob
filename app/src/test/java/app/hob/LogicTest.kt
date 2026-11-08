@@ -7,6 +7,7 @@ import app.hob.data.Thing
 import app.hob.domain.Cat
 import app.hob.domain.Growth
 import app.hob.domain.Guess
+import app.hob.domain.moved
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
@@ -19,6 +20,14 @@ class LogicTest {
     private fun jacket(label: String, kind: Int = Size.HEIGHT): Thing {
         val r = Growth.parse(kind, label)!!
         return Thing(name = "j", emoji = "", cat = "", spot = 1, added = 0, touched = 0, sizeKind = kind, sizeMin = r.first, sizeMax = r.second, sizeLabel = label)
+    }
+
+    @Test fun movesRooms() {
+        val rooms = listOf("hall", "kitchen", "bath", "nursery")
+        assertEquals(listOf("kitchen", "bath", "hall", "nursery"), rooms.moved(0, 2))
+        assertEquals(listOf("nursery", "hall", "kitchen", "bath"), rooms.moved(3, 0))
+        assertEquals(rooms, rooms.moved(1, 1))
+        assertEquals(rooms, rooms.moved(1, 9))
     }
 
     @Test fun parsesLabels() {

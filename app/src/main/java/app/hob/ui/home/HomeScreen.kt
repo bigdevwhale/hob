@@ -1,5 +1,16 @@
 package app.hob.ui.home
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationVector2D
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.VectorConverter
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
+import android.os.SystemClock
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -29,6 +40,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import app.hob.domain.moved
+import androidx.compose.ui.zIndex
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
@@ -127,18 +148,7 @@ fun HomeScreen(h: House, nav: Nav) {
             for (p in h.places) Chip(p.name, p.id == place) { place = p.id }
             Chip("+", false) { newPlace = true }
         }
-        val rooms = h.roomsIn(place)
-        Column(Modifier.padding(horizontal = 18.dp), verticalArrangement = Arrangement.spacedBy(9.dp)) {
-            (rooms.map { it as Room? } + listOf(null)).chunked(3).forEach { row ->
-                Row(horizontalArrangement = Arrangement.spacedBy(9.dp)) {
-                    for (r in row) Box(Modifier.weight(1f)) {
-                        if (r != null) RoomTile(r, h) { nav.open(Overlay.Room(r.id)) }
-                        else AddTile { nav.open(Overlay.RoomEdit(place = place)) }
-                    }
-                    repeat(3 - row.size) { Box(Modifier.weight(1f)) }
-                }
-            }
-        }
+        RoomGrid(h, place, nav)
 
         if (dusty.isNotEmpty()) {
             SectionTitle(stringResource(R.string.clear_out))
@@ -163,6 +173,111 @@ fun HomeScreen(h: House, nav: Nav) {
             Btn(stringResource(R.string.add_btn), {
                 if (name.isNotBlank()) c.write { place = addPlace(name); newPlace = false }
             }, Modifier.fillMaxWidth().padding(top = 16.dp), enabled = name.isNotBlank())
+        }
+    }
+}
+
+/** The rooms of one place, three to a row. Hold a tile and drag it to move the room. */
+@Composable
+private fun RoomGrid(h: House, place: Long, nav: Nav) {
+    val c = LocalContext.current.container
+    val haptic = LocalHapticFeedback.current
+    val rooms = h.roomsIn(place)
+    val ids = rooms.map { it.id }
+    val dbIds by rememberUpdatedState(ids)
+    var order by remember(place) { mutableStateOf(ids) }
+    var dragId by remember { mutableStateOf<Long?>(null) }
+    // A drop is written before the database catches up; hold the new order until it does.
+    var pending by remember(place) { mutableStateOf(false) }
+    if (dragId == null) {
+        if (pending && (ids == order || ids.toSet() != order.toSet())) pending = false
+        if (!pending && order != ids) order = ids
+    }
+    // The gesture lives on the whole grid, not on a tile: a tile changes slots mid-drag.
+    var grid by remember { mutableStateOf<LayoutCoordinates?>(null) }
+    val slots = remember { mutableMapOf<Int, LayoutCoordinates>() }
+    fun slot(i: Int): Rect? {
+        val g = grid ?: return null
+        val s = slots[i]?.takeIf { it.isAttached && g.isAttached } ?: return null
+        return g.localBoundingBoxOf(s)
+    }
+    // Where the held tile's top-left corner should be, in grid coordinates, and where the finger took hold of it.
+    var lift by remember { mutableStateOf(Offset.Zero) }
+    var grip by remember { mutableStateOf(Offset.Zero) }
+    // A long press that ends without moving still lets the tile's click through; this swallows it.
+    var droppedAt by remember { mutableLongStateOf(0L) }
+    // Where each room's tile is drawn, in grid coordinates; it glides to its slot instead of jumping.
+    val pos = remember(place) { mutableMapOf<Long, Animatable<Offset, AnimationVector2D>>() }
+    val scope = rememberCoroutineScope()
+
+    val byId = rooms.associateBy { it.id }
+    val shown = order.mapNotNull { byId[it] }
+    Column(Modifier.padding(horizontal = 18.dp)
+        .onGloballyPositioned { grid = it }
+        .pointerInput(place) {
+            fun drop() {
+                val id = dragId ?: return
+                // Set the tile down where the finger left it; from there it glides into its slot.
+                val from = lift
+                scope.launch { pos[id]?.snapTo(from) }
+                dragId = null
+                droppedAt = SystemClock.uptimeMillis()
+                if (order != dbIds) { pending = true; val o = order; c.write { reorderRooms(o) } }
+            }
+            detectDragGesturesAfterLongPress(
+                onDragStart = { at ->
+                    val i = order.indices.firstOrNull { slot(it)?.contains(at) == true } ?: return@detectDragGesturesAfterLongPress
+                    val r = slot(i) ?: return@detectDragGesturesAfterLongPress
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    grip = at - r.topLeft; lift = r.topLeft; dragId = order[i]
+                },
+                onDrag = { change, delta ->
+                    val id = dragId ?: return@detectDragGesturesAfterLongPress
+                    change.consume()
+                    lift += delta
+                    val finger = lift + grip
+                    val from = order.indexOf(id)
+                    val to = order.indices.firstOrNull { slot(it)?.contains(finger) == true }
+                    if (to != null && to != from) {
+                        order = order.moved(from, to)
+                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    }
+                },
+                onDragEnd = { drop() },
+                onDragCancel = { drop() },
+            )
+        }, verticalArrangement = Arrangement.spacedBy(9.dp)) {
+        (shown.map { it as Room? } + listOf(null)).chunked(3).forEachIndexed { ri, row ->
+            val lifted = row.any { it != null && it.id == dragId }
+            Row(Modifier.zIndex(if (lifted) 1f else 0f), horizontalArrangement = Arrangement.spacedBy(9.dp)) {
+                row.forEachIndexed { ci, r ->
+                    val i = ri * 3 + ci
+                    val held = r != null && r.id == dragId
+                    Box(Modifier.weight(1f).zIndex(if (held) 1f else 0f).onGloballyPositioned { slots[i] = it }) {
+                        if (r == null) AddTile { nav.open(Overlay.RoomEdit(place = place)) }
+                        else {
+                            LaunchedEffect(r.id, i, held) {
+                                val to = slot(i)?.topLeft ?: return@LaunchedEffect
+                                val a = pos.getOrPut(r.id) { Animatable(to, Offset.VectorConverter) }
+                                if (!held) a.animateTo(to, spring(dampingRatio = .8f, stiffness = Spring.StiffnessMediumLow))
+                            }
+                            val up by animateFloatAsState(if (held) 1f else 0f, spring(stiffness = Spring.StiffnessMedium), label = "lift")
+                            Box(Modifier.graphicsLayer {
+                                val at = slot(i)?.topLeft
+                                val drawn = if (held) lift else pos[r.id]?.value
+                                if (at != null && drawn != null) { translationX = drawn.x - at.x; translationY = drawn.y - at.y }
+                                scaleX = 1f + .06f * up; scaleY = scaleX
+                                shadowElevation = 12.dp.toPx() * up; shape = R18; clip = true
+                            }) {
+                            RoomTile(r, h) {
+                                if (dragId == null && SystemClock.uptimeMillis() - droppedAt > 400) nav.open(Overlay.Room(r.id))
+                            }
+                        }
+                        }
+                    }
+                }
+                repeat(3 - row.size) { Box(Modifier.weight(1f)) }
+            }
         }
     }
 }

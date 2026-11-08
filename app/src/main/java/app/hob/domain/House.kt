@@ -157,3 +157,9 @@ sealed interface Hint {
 }
 
 enum class Badge(val emoji: String) { BOXES("🧺"), LIT("🔦"), CLEAN("🧹"), HUNDRED("📦"), RELAY("🧥"), SEASON("🎄"), BACK("🤝"), OLD("🗝️") }
+
+/** The list with the item at [from] lifted out and set down at [to]; out-of-range indices leave it as is. */
+fun <T> List<T>.moved(from: Int, to: Int): List<T> {
+    if (from == to || from !in indices || to !in indices) return this
+    return toMutableList().apply { add(to, removeAt(from)) }
+}

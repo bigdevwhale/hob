@@ -57,6 +57,12 @@ class AppContainer(context: Context) {
         return id
     }
 
+    /** Puts rooms in the given order (ids of one place's rooms, first to last). */
+    suspend fun reorderRooms(ids: List<Long>) {
+        val rooms = dao.roomsNow().associateBy { it.id }
+        ids.forEachIndexed { i, id -> rooms[id]?.takeIf { it.sort != i }?.let { dao.save(it.copy(sort = i, updated = now())) } }
+    }
+
     suspend fun addSpot(room: Long, name: String): Long = dao.add(Spot(room = room, name = name.trim(), sort = dao.spotsNow().count { it.room == room }))
 
     suspend fun addBox(spot: Long, label: String): Long = dao.add(Box(num = dao.lastBox() + 1, label = label.trim(), spot = spot))

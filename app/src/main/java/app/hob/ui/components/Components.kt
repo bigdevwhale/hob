@@ -1,5 +1,12 @@
 package app.hob.ui.components
 
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -187,6 +194,39 @@ fun Pic(t: Thing, modifier: Modifier = Modifier, size: Dp = 48.dp, big: Boolean 
     Box(modifier.size(size).clip(RoundedCornerShape(size * 0.31f)).background(C.card2), contentAlignment = Alignment.Center) {
         val b = state.value
         if (b != null) Image(b, null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop) else Text(t.emoji, fontSize = (size.value * 0.5f).sp)
+    }
+}
+
+/** The thing's photo over the whole screen, uncropped: pinch or double-tap to zoom, tap or Back to close (#4). */
+@Composable
+fun PhotoViewer(t: Thing, onClose: () -> Unit) {
+    val c = LocalContext.current.container
+    val key = "${t.id}:true:${t.updated}"
+    val state = remember(key) { mutableStateOf<ImageBitmap?>(c.photos.cached(t.id, true, t.updated)?.asImageBitmap()) }
+    LaunchedEffect(key) { if (state.value == null) state.value = c.photos.load(t.id, true, t.updated)?.asImageBitmap() }
+    var scale by remember { mutableStateOf(1f) }
+    var offset by remember { mutableStateOf(androidx.compose.ui.geometry.Offset.Zero) }
+    androidx.compose.ui.window.Dialog(onClose, androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false, decorFitsSystemWindows = false)) {
+        Box(
+            Modifier.fillMaxSize().background(Color.Black)
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onTap = { onClose() },
+                        onDoubleTap = { if (scale > 1.01f) { scale = 1f; offset = androidx.compose.ui.geometry.Offset.Zero } else scale = 2.5f },
+                    )
+                }
+                .pointerInput(Unit) {
+                    detectTransformGestures { _, pan, zoom, _ ->
+                        scale = (scale * zoom).coerceIn(1f, 6f)
+                        offset = if (scale == 1f) androidx.compose.ui.geometry.Offset.Zero else offset + pan
+                    }
+                },
+            contentAlignment = Alignment.Center,
+        ) {
+            state.value?.let { b ->
+                Image(b, t.name, Modifier.fillMaxSize().graphicsLayer { scaleX = scale; scaleY = scale; translationX = offset.x; translationY = offset.y }, contentScale = ContentScale.Fit)
+            }
+        }
     }
 }
 

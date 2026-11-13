@@ -1,5 +1,6 @@
 package app.hob.ui.thing
 
+import androidx.compose.foundation.clickable
 import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -90,6 +91,8 @@ fun ThingScreen(id: Long, h: House, nav: Nav) {
     val t = h.thing(id) ?: run { nav.close(); return }
     val next = h.next(t)
     var ask by remember { mutableStateOf<Ask?>(null) }
+    var viewing by remember { mutableStateOf(false) }
+    if (viewing && t.photo) app.hob.ui.components.PhotoViewer(t) { viewing = false }
 
     Column(Modifier.verticalScroll(rememberScrollState()).navigationBarsPadding().padding(bottom = 24.dp)) {
         TopBar(t.name, null, { nav.close() }) {
@@ -97,7 +100,7 @@ fun ThingScreen(id: Long, h: House, nav: Nav) {
         }
         Column(Modifier.fillMaxWidth().padding(horizontal = 18.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Box(Modifier.size(150.dp).drawBehind { drawCircle(Brush.radialGradient(listOf(C.amber.copy(alpha = .28f), Color.Transparent))) }, contentAlignment = Alignment.Center) {
-                if (t.photo) Pic(t, Modifier.clip(CircleShape), size = 128.dp, big = true) else Text(t.emoji, fontSize = 64.sp)
+                if (t.photo) Pic(t, Modifier.clip(CircleShape).clickable { viewing = true }, size = 128.dp, big = true) else Text(t.emoji, fontSize = 64.sp)
             }
             Text(
                 when (t.state) {

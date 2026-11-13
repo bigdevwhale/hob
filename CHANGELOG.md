@@ -6,6 +6,15 @@ line "<!-- tg", then 2-4 short lines in Russian for users (what is new, what is 
 then close it like any HTML comment. The release notes carry it, and the chat bot posts those lines.
 -->
 
+## [1.0.3] - 2026-11-13
+
+### Added
+- Tap a thing's photo on its card to see it whole, over the full screen: pinch or double-tap to zoom, tap or Back to close (#4).
+
+<!-- tg
+Новое: фото вещи на карточке раскрывается на весь экран – нажми на него. Можно приблизить двумя пальцами или двойным нажатием.
+-->
+
 ## [1.0.2] - 2026-11-08
 
 - Many more signs: about 240 for things, in groups (clothes, sport, gadgets, tools, kitchen, papers, children, holidays, home and garden, health and hobbies), and 40 for rooms. Any emoji can be typed in as a sign of your own (#3).

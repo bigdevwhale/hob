@@ -80,6 +80,7 @@ import app.hob.ui.Words
 import app.hob.ui.components.Btn
 import app.hob.ui.components.Card
 import app.hob.ui.components.Chip
+import app.hob.ui.components.Chips
 import app.hob.ui.components.Em
 import app.hob.ui.components.Field
 import app.hob.ui.components.HobFigure
@@ -147,9 +148,12 @@ fun HomeScreen(h: House, nav: Nav) {
         }
 
         SectionTitle(stringResource(R.string.rooms), action = stringResource(R.string.add_room)) { nav.open(Overlay.RoomEdit(place = place)) }
-        Row(Modifier.padding(horizontal = 18.dp).padding(bottom = 10.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            for (p in h.places) Chip(p.name, p.id == place, onLongClick = { editPlace = p }) { if (p.id == place) editPlace = p else place = p.id }
-            Chip("+", false) { newPlace = true }
+        // Places wrap onto more lines when they do not fit in one.
+        Box(Modifier.padding(horizontal = 18.dp).padding(bottom = 10.dp)) {
+            Chips {
+                for (p in h.places) Chip(p.name, p.id == place, onLongClick = { editPlace = p }) { if (p.id == place) editPlace = p else place = p.id }
+                Chip("+", false) { newPlace = true }
+            }
         }
         RoomGrid(h, place, nav)
 

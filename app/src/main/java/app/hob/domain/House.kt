@@ -135,6 +135,9 @@ class House(
         return if (onlyUsed) all.filter { it in used } else all
     }
 
+    /** The sign a section gives its things by default: the built-in one, or the one the owner chose for their own. */
+    fun catSign(key: String): String = OwnCat.of(key)?.let { s.catSigns[it] ?: OwnCat.SIGN } ?: Cat.of(key).emoji
+
     fun search(q: String, cat: String?): List<Thing> {
         val words = q.lowercase().split(Regex("""\s+""")).filter { it.isNotBlank() }
         return home.filter { t ->

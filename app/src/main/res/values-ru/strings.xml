@@ -187,6 +187,7 @@
     <string name="thing_cat">Раздел</string>
     <string name="own_cat_plus">+ свой раздел</string>
     <string name="own_cat_hint">Рыбалка, рукоделие, машина…</string>
+    <string name="own_cat_sign_hint">Зажмите свой раздел, чтобы выбрать ему значок.</string>
     <string name="own_cats">Свои разделы</string>
     <string name="own_cats_hint">Нажмите, чтобы убрать раздел из списка. Вещи в нём его сохранят.</string>
     <string name="thing_where">Где лежит</string>

@@ -126,7 +126,7 @@ fun SettingsPage(h: House, nav: Nav) {
 
             if (s.cats.isNotEmpty()) Card(Modifier.fillMaxWidth().padding(top = 12.dp)) {
                 Section(stringResource(R.string.own_cats), stringResource(R.string.own_cats_hint))
-                Chips { for (n in s.cats) Chip("$n  ✕", false) { put { it.copy(cats = it.cats - n) } } }
+                Chips { for (n in s.cats) Chip("${s.catSigns[n] ?: app.hob.domain.OwnCat.SIGN} $n  ✕", false) { put { it.copy(cats = it.cats - n) } } }
             }
 
             Card(Modifier.fillMaxWidth().padding(top = 12.dp)) {

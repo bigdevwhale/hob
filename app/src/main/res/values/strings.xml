@@ -187,6 +187,7 @@
     <string name="thing_cat">Kind</string>
     <string name="own_cat_plus">+ your own</string>
     <string name="own_cat_hint">Fishing, crafts, the car…</string>
+    <string name="own_cat_sign_hint">Hold your own section to choose its sign.</string>
     <string name="own_cats">Your own sections</string>
     <string name="own_cats_hint">Tap one to remove it from the list. Things in it keep their section.</string>
     <string name="thing_where">Where it lies</string>

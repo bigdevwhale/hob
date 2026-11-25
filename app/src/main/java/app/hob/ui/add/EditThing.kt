@@ -57,7 +57,6 @@ import app.hob.ui.Nav
 import app.hob.ui.Overlay
 import app.hob.ui.Words
 import app.hob.ui.catName
-import app.hob.ui.catSign
 import app.hob.ui.components.Btn
 import app.hob.ui.components.Chip
 import app.hob.ui.components.Chips
@@ -88,7 +87,10 @@ fun EditThing(o: Overlay.Edit, h: House, nav: Nav) {
     var name by remember { mutableStateOf(old?.name ?: o.name) }
     var emoji by remember { mutableStateOf(old?.emoji ?: Guess.of(o.name)?.emoji ?: "📦") }
     var cat by remember { mutableStateOf(old?.cat ?: Guess.of(o.name)?.cat?.key ?: Cat.OTHER.key) }
-    var manual by remember { mutableStateOf(old != null) }
+    // Picked by hand, so no longer following the name or the section. An old thing's sign counts as its own choice
+    // unless it is still the one its section or its name gave it.
+    var signByHand by remember { mutableStateOf(old != null && old.emoji != h.catSign(old.cat) && old.emoji != Guess.of(old.name)?.emoji) }
+    var catByHand by remember { mutableStateOf(old != null) }
     var where by remember { mutableStateOf(h.settle(if (old != null) Where(spot = old.spot, box = old.box) else Where(o.room, o.spot, o.box))) }
     var sizeKind by remember { mutableStateOf(old?.sizeKind ?: Size.NONE) }
     var sizeLabel by remember { mutableStateOf(old?.sizeLabel ?: "") }
@@ -101,14 +103,23 @@ fun EditThing(o: Overlay.Edit, h: House, nav: Nav) {
     var shot by remember { mutableStateOf<Uri?>(null) }
     var picking by remember { mutableStateOf(false) }
     var newCat by remember { mutableStateOf<String?>(null) }
+    var newCatSign by remember { mutableStateOf<String?>(null) }
+    // Whose sign the sign sheet is choosing: the thing's (null), the new section's («») or an own section's (its name).
+    var signFor by remember { mutableStateOf<String?>(null) }
 
     // The sign, the kind and how the size is measured follow the name until the owner picks them by hand.
     LaunchedEffect(name) {
-        if (manual) return@LaunchedEffect
+        if (old != null && name == old.name) return@LaunchedEffect
         Guess.of(name)?.let { g ->
-            emoji = g.emoji; cat = g.cat.key
-            if (sizeKind == Size.NONE && g.size != Size.NONE && h.kids.isNotEmpty()) sizeKind = g.size
+            if (!catByHand) cat = g.cat.key
+            if (!signByHand) emoji = g.emoji
+            if (!catByHand && sizeKind == Size.NONE && g.size != Size.NONE && h.kids.isNotEmpty()) sizeKind = g.size
         }
+    }
+    // A section picked by hand brings its sign, unless the sign too was picked by hand.
+    fun pickCat(k: String, sign: String = h.catSign(k)) {
+        cat = k; catByHand = true
+        if (!signByHand) emoji = sign
     }
     LaunchedEffect(photo) { photo?.let { u -> preview = c.photos.read(u, 900)?.asImageBitmap() } }
 
@@ -146,18 +157,26 @@ fun EditThing(o: Overlay.Edit, h: House, nav: Nav) {
 
             Label(stringResource(R.string.thing_cat))
             Chips {
-                for (k in h.catKeys()) Chip("${catSign(k)} ${catName(k)}", cat == k) { cat = k; manual = true }
-                Chip(stringResource(R.string.own_cat_plus), false) { newCat = "" }
+                for (k in h.catKeys()) {
+                    val own = app.hob.domain.OwnCat.of(k)
+                    Chip("${h.catSign(k)} ${catName(k)}", cat == k, onLongClick = own?.let { n -> { signFor = n } }) { pickCat(k) }
+                }
+                Chip(stringResource(R.string.own_cat_plus), false) { newCat = ""; newCatSign = null }
             }
+            if (h.catKeys().any { app.hob.domain.OwnCat.of(it) != null }) Text(stringResource(R.string.own_cat_sign_hint), style = T.Small, modifier = Modifier.padding(top = 6.dp, start = 2.dp))
             newCat?.let { v ->
                 Row(Modifier.padding(top = 9.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Box(Modifier.padding(end = 8.dp).size(44.dp).clip(R14).background(C.card).clickable { signFor = "" }, contentAlignment = Alignment.Center) {
+                        Text(newCatSign ?: app.hob.domain.OwnCat.SIGN, fontSize = 22.sp)
+                    }
                     Field(v, { newCat = it }, null, Modifier.weight(1f), hint = stringResource(R.string.own_cat_hint))
                     Box(Modifier.padding(start = 8.dp)) {
                         Btn(stringResource(R.string.add_btn), {
                             val name = v.trim()
                             if (name.isNotEmpty()) {
-                                c.write { settings.update { s -> s.copy(cats = (s.cats + name).distinct()) } }
-                                cat = app.hob.domain.OwnCat.key(name); manual = true; newCat = null
+                                val sign = newCatSign
+                                c.write { settings.update { s -> s.copy(cats = (s.cats + name).distinct(), catSigns = if (sign == null) s.catSigns else s.catSigns + (name to sign)) } }
+                                pickCat(app.hob.domain.OwnCat.key(name), sign ?: h.catSign(app.hob.domain.OwnCat.key(name))); newCat = null
                             }
                         }, small = true)
                     }
@@ -171,8 +190,8 @@ fun EditThing(o: Overlay.Edit, h: House, nav: Nav) {
             Label(stringResource(R.string.grow_q))
             Chips {
                 Chip(stringResource(R.string.grow_no), sizeKind == Size.NONE) { sizeKind = Size.NONE }
-                Chip(stringResource(R.string.grow_height), sizeKind == Size.HEIGHT) { sizeKind = Size.HEIGHT; manual = true }
-                Chip(stringResource(R.string.grow_foot), sizeKind == Size.FOOT) { sizeKind = Size.FOOT; manual = true }
+                Chip(stringResource(R.string.grow_height), sizeKind == Size.HEIGHT) { sizeKind = Size.HEIGHT }
+                Chip(stringResource(R.string.grow_foot), sizeKind == Size.FOOT) { sizeKind = Size.FOOT }
             }
             if (sizeKind != Size.NONE) {
                 Field(sizeLabel, { sizeLabel = it }, null, Modifier.padding(top = 9.dp), hint = stringResource(if (sizeKind == Size.HEIGHT) R.string.size_hint_h else R.string.size_hint_f))
@@ -232,6 +251,19 @@ fun EditThing(o: Overlay.Edit, h: House, nav: Nav) {
     }
 
     if (picking) Sheet(stringResource(R.string.pick_sign), { picking = false }) {
-        ThingSigns(emoji) { e -> emoji = e; manual = true; picking = false }
+        ThingSigns(emoji) { e -> emoji = e; signByHand = true; picking = false }
+    }
+    signFor?.let { n ->
+        val ownKey = app.hob.domain.OwnCat.key(n)
+        Sheet(if (n.isEmpty()) stringResource(R.string.pick_sign) else "${stringResource(R.string.pick_sign)}: $n", { signFor = null }) {
+            ThingSigns(if (n.isEmpty()) newCatSign ?: "" else h.catSign(ownKey)) { e ->
+                if (n.isEmpty()) newCatSign = e
+                else {
+                    c.write { settings.update { s -> s.copy(catSigns = s.catSigns + (n to e)) } }
+                    if (cat == ownKey && !signByHand) emoji = e
+                }
+                signFor = null
+            }
+        }
     }
 }

@@ -97,5 +97,4 @@ object Words {
 @Composable fun span(days: Long) = Words.span(LocalContext.current, days)
 @Composable fun catName(c: Cat) = Words.cat(LocalContext.current, c)
 @Composable fun catName(key: String) = app.hob.domain.OwnCat.of(key) ?: Words.cat(LocalContext.current, Cat.of(key))
-fun catSign(key: String) = if (app.hob.domain.OwnCat.of(key) != null) "🏷️" else Cat.of(key).emoji
 @Composable fun things(n: Int) = Words.things(LocalContext.current, n)

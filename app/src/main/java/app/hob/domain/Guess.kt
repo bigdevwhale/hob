@@ -16,6 +16,8 @@ enum class Cat(val key: String, val emoji: String) {
 /** Own sections live in the same field as the built-in ones, as «u:<name>». */
 object OwnCat {
     const val PREFIX = "u:"
+    /** The sign of an own section the owner gave none. */
+    const val SIGN = "🏷️"
     fun key(name: String) = PREFIX + name.trim()
     fun of(key: String): String? = if (key.startsWith(PREFIX)) key.removePrefix(PREFIX) else null
 }

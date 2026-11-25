@@ -31,6 +31,8 @@ data class Settings(
     val tipsOff: Boolean = false,
     /** The owner's own sections, by name. */
     val cats: List<String> = emptyList(),
+    /** Signs the owner gave their own sections, by section name. */
+    val catSigns: Map<String, String> = emptyMap(),
 )
 
 class SettingsStore(context: Context) {
@@ -48,6 +50,8 @@ class SettingsStore(context: Context) {
         tips = this[TIPS]?.split(',')?.filter { it.isNotBlank() }?.toSet() ?: emptySet(),
         tipsOff = this[TIPS_OFF] ?: false,
         cats = this[CATS]?.split('\n')?.filter { it.isNotBlank() } ?: emptyList(),
+        // One section a line: «name<tab>sign».
+        catSigns = this[CAT_SIGNS]?.split('\n')?.mapNotNull { l -> l.split('\t').takeIf { it.size == 2 && it[1].isNotBlank() }?.let { it[0] to it[1] } }?.toMap() ?: emptyMap(),
     )
 
     suspend fun now(): Settings = settings.first()
@@ -64,6 +68,7 @@ class SettingsStore(context: Context) {
             it[TIPS] = s.tips.joinToString(",")
             it[TIPS_OFF] = s.tipsOff
             it[CATS] = s.cats.joinToString("\n")
+            it[CAT_SIGNS] = s.catSigns.entries.joinToString("\n") { (n, e) -> "$n\t$e" }
         }
     }
 
@@ -77,5 +82,6 @@ class SettingsStore(context: Context) {
         val TIPS = stringPreferencesKey("tips")
         val TIPS_OFF = booleanPreferencesKey("tips_off")
         val CATS = stringPreferencesKey("cats")
+        val CAT_SIGNS = stringPreferencesKey("cat_signs")
     }
 }

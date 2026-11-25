@@ -6,6 +6,21 @@ line "<!-- tg", then 2-4 short lines in Russian for users (what is new, what is 
 then close it like any HTML comment. The release notes carry it, and the chat bot posts those lines.
 -->
 
+## [1.0.4] - 2026-11-25
+
+### Added
+- Your own sections can have a sign of their own: choose it when you add a section, or hold the section to change it (#6).
+
+### Fixed
+- Picking a section by hand now gives the thing that section's sign, unless you chose the sign yourself (#6).
+- Places on the home screen wrap onto more lines instead of running off the edge (#5).
+
+<!-- tg
+Новое: своему разделу можно выбрать значок – при создании или долгим нажатием на раздел.
+Исправлено: при смене раздела значок вещи меняется на значок раздела, если вы не выбрали его сами.
+Исправлено: адреса на главном экране переносятся на новую строку, а не уезжают за край.
+-->
+
 ## [1.0.3] - 2026-11-13
 
 ### Added
